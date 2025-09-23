@@ -16,7 +16,7 @@ streamlit run app.py
 
 ## Dizionari
 
-La logica si basa su due file di testo posizionati nella cartella `data/`:
+La cartella `data/` è inclusa nel repository (vuota a parte da un segnaposto) per ospitare i dizionari personalizzati. La logica si basa su due file di testo posizionati al suo interno:
 
 - `data/answers.txt`: elenco delle possibili parole segrete, una per riga, senza limitazioni di lunghezza.
 - `data/allowed.txt`: parole accettate come tentativi. Può includere anche le soluzioni.
