@@ -38,6 +38,7 @@ def _init_session_state() -> None:
         "distribution": {},
     })
     st.session_state.setdefault("guess_input", "")
+    st.session_state.setdefault("clear_guess_input", False)
     st.session_state.setdefault("game_over", False)
     st.session_state.setdefault("answer", "")
     st.session_state.setdefault("answer_signature", "")
@@ -80,6 +81,14 @@ def _update_stats(win: bool, attempts_used: int) -> None:
 
     st.session_state["stats"] = stats
     st.session_state["result_recorded"] = True
+
+
+def _rerun() -> None:
+    rerun = getattr(st, "experimental_rerun", None)
+    if rerun is not None:
+        rerun()
+    else:
+        st.rerun()
 
 
 def _ensure_answer(dictionaries: Dictionaries, mode: str) -> None:
@@ -241,6 +250,9 @@ def main() -> None:
     game_over = st.session_state.get("game_over", False)
 
     with st.form("guess_form", clear_on_submit=False):
+        if st.session_state.get("clear_guess_input"):
+            st.session_state["guess_input"] = ""
+            st.session_state["clear_guess_input"] = False
         guess_value = st.text_input(
             "Inserisci un tentativo",
             value=st.session_state.get("guess_input", ""),
@@ -254,8 +266,8 @@ def main() -> None:
         new_game = col_new.form_submit_button("Nuova partita")
 
     if clear:
-        st.session_state["guess_input"] = ""
-        st.experimental_rerun()
+        st.session_state["clear_guess_input"] = True
+        _rerun()
         return
 
     if new_game:
@@ -266,7 +278,7 @@ def main() -> None:
             fresh_answer = _choose_free_word(dictionaries.answers)
             signature = f"free-{SYSTEM_RANDOM.randrange(1_000_000_000)}"
             _start_new_round(fresh_answer, signature=signature)
-        st.experimental_rerun()
+        _rerun()
         return
 
     if submit and not game_over:
@@ -292,7 +304,7 @@ def main() -> None:
             evaluations.append(evaluation)
             st.session_state["guesses"] = guesses
             st.session_state["evaluations"] = evaluations
-            st.session_state["guess_input"] = ""
+            st.session_state["clear_guess_input"] = True
 
             if all(status == STATUS_GREEN for status in evaluation):
                 st.session_state["game_over"] = True
@@ -301,7 +313,7 @@ def main() -> None:
                 st.session_state["game_over"] = True
                 render_toast(f"Tentativi esauriti. La parola era '{answer}'.", level="error")
 
-            st.experimental_rerun()
+            _rerun()
             return
 
     attempts_used = len(guesses)
