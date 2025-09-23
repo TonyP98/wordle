@@ -54,7 +54,7 @@ def _start_new_round(answer: str, *, signature: str) -> None:
     st.session_state["evaluations"] = []
     st.session_state["game_over"] = False
     st.session_state["result_recorded"] = False
-    st.session_state["guess_input"] = ""
+    st.session_state["clear_guess_input"] = True
 
 
 def _choose_free_word(answers: Sequence[str]) -> str:
