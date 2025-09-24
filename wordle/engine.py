@@ -129,20 +129,20 @@ def build_hard_mode_constraints(history: Sequence[Tuple[str, Sequence[Status]]])
 def validate_guess(
     guess: str,
     answer: str,
-    allowed_lookup: dict[str, str],
     *,
     hard_constraints: HardModeConstraints | None = None,
 ) -> None:
     """Validate a guess against the active rules.
 
+    All words are considered valid attempts as long as they satisfy the
+    structural requirements (length, trimming) and any hard mode constraints.
+    
     Parameters
     ----------
     guess:
         The raw string entered by the user.
     answer:
         The current secret word.
-    allowed_lookup:
-        Mapping of normalised words to their canonical representation.
     hard_constraints:
         Optional hard mode requirements that must be satisfied.
 
@@ -165,10 +165,6 @@ def validate_guess(
         raise ValidationError(
             f"La parola deve contenere esattamente {len(answer)} caratteri."
         )
-
-    normalised_word = "".join(guess_norm)
-    if normalised_word not in allowed_lookup:
-        raise ValidationError("La parola non è presente nel dizionario consentito.")
 
     if hard_constraints is None:
         return
