@@ -16,12 +16,11 @@ streamlit run app.py
 
 ## Dizionari
 
-La cartella `data/` è inclusa nel repository (vuota a parte da un segnaposto) per ospitare i dizionari personalizzati. La logica si basa su due file di testo posizionati al suo interno:
+La cartella `data/` è inclusa nel repository (vuota a parte da un segnaposto) per ospitare il dizionario delle risposte personalizzato:
 
 - `data/answers.txt`: elenco delle possibili parole segrete, una per riga, senza limitazioni di lunghezza.
-- `data/allowed.txt`: parole accettate come tentativi. Può includere anche le soluzioni.
 
-Se i file non esistono vengono creati automaticamente con un esempio minimo e l'app mostra un avviso. Sostituiscili con i tuoi elenchi (una parola per riga, niente spazi iniziali/finali). Non vengono normalizzati accenti o maiuscole/minuscole: le parole sono confrontate così come scritte nei file.
+Se il file non esiste viene creato automaticamente con un esempio minimo e l'app mostra un avviso. Sostituiscilo con il tuo elenco (una parola per riga, niente spazi iniziali/finali). Non vengono normalizzati accenti o maiuscole/minuscole: le parole sono confrontate così come scritte nel file.
 
 ## Modalità di gioco
 
@@ -34,7 +33,7 @@ Nel pannello laterale puoi modificare il numero massimo di tentativi (default 6)
 
 - Griglia dinamica che si adatta alla lunghezza della parola corrente.
 - Tastiera virtuale mostrata automaticamente quando l'alfabeto dei dizionari è compatto (≤40 simboli stampabili).
-- Campo di input senza limite di caratteri: la validazione assicura che ogni tentativo abbia la stessa lunghezza della soluzione ed esista nel dizionario consentito.
+- Campo di input senza limite di caratteri: la validazione assicura che ogni tentativo abbia la stessa lunghezza della soluzione e rispetti gli eventuali vincoli della modalità difficile.
 - Pulsanti rapidi per inviare, cancellare o avviare una nuova partita e bottone di condivisione che copia negli appunti la griglia in formato emoji.
 
 ## Test
