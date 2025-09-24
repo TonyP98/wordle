@@ -31,13 +31,20 @@ def test_score_guess_mixed_lengths():
 
 def test_validate_guess_length_mismatch():
     with pytest.raises(ValidationError):
-        validate_guess("casa", "casale", {"casa": "casa"})
+        validate_guess("casa", "casale")
 
 
-def test_validate_guess_unknown_word():
-    allowed_lookup = {"casa": "casa", "fiume": "fiume"}
+def test_validate_guess_unknown_word_allowed_without_dictionary():
+    validate_guess("laghi", "fiume")
+
+
+def test_validate_guess_unknown_word_rejected_when_dictionary_provided():
     with pytest.raises(ValidationError):
-        validate_guess("lago", "fiume", allowed_lookup)
+        validate_guess("laghi", "fiume", valid_words={"fiume"})
+
+
+def test_validate_guess_dictionary_lookup_is_case_insensitive():
+    validate_guess("FIUME", "fiume", valid_words={"fiume"})
 
 
 def test_validate_guess_hard_mode_constraints():
@@ -46,15 +53,10 @@ def test_validate_guess_hard_mode_constraints():
     evaluation = score_guess(first_guess, answer)
     history = [(first_guess, evaluation)]
     constraints = build_hard_mode_constraints(history)
-    allowed_lookup = {
-        "casa": "casa",
-        "cane": "cane",
-        "coro": "coro",
-    }
 
     with pytest.raises(ValidationError):
-        validate_guess("coro", answer, allowed_lookup, hard_constraints=constraints)
+        validate_guess("coro", answer, hard_constraints=constraints)
 
     # Correctly reusing greens succeeds.
-    validate_guess("cane", answer, allowed_lookup, hard_constraints=constraints)
+    validate_guess("cane", answer, hard_constraints=constraints)
 

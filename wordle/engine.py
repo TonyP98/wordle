@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections import Counter, defaultdict
 from dataclasses import dataclass
-from typing import List, Sequence, Tuple
+from typing import Collection, Iterable, List, Sequence, Tuple
 
 MAX_ATTEMPTS = 6
 
@@ -126,23 +126,34 @@ def build_hard_mode_constraints(history: Sequence[Tuple[str, Sequence[Status]]])
     )
 
 
+def _normalise_word(word: Iterable[str]) -> str:
+    """Return the casefolded representation of the given iterable of letters."""
+
+    return "".join(_normalise_letter(ch) for ch in word)
+
+
 def validate_guess(
     guess: str,
     answer: str,
-    allowed_lookup: dict[str, str],
     *,
+    valid_words: Collection[str] | None = None,
     hard_constraints: HardModeConstraints | None = None,
 ) -> None:
     """Validate a guess against the active rules.
 
+    By default all words are considered valid as long as they satisfy the
+    structural requirements (length, trimming) and any hard mode constraints.
+    When ``valid_words`` is provided the guess must also appear in that
+    dictionary (comparison is case-insensitive).
+    
     Parameters
     ----------
     guess:
         The raw string entered by the user.
     answer:
         The current secret word.
-    allowed_lookup:
-        Mapping of normalised words to their canonical representation.
+    valid_words:
+        Optional dictionary of allowed guesses.
     hard_constraints:
         Optional hard mode requirements that must be satisfied.
 
@@ -158,17 +169,20 @@ def validate_guess(
     if guess.strip() != guess:
         raise ValidationError("Rimuovi spazi iniziali o finali dalla parola inserita.")
 
-    guess_letters = list(guess)
-    guess_norm = [_normalise_letter(ch) for ch in guess_letters]
+    guess_norm = [_normalise_letter(ch) for ch in guess]
 
     if len(guess_norm) != len(answer):
         raise ValidationError(
             f"La parola deve contenere esattamente {len(answer)} caratteri."
         )
 
-    normalised_word = "".join(guess_norm)
-    if normalised_word not in allowed_lookup:
-        raise ValidationError("La parola non è presente nel dizionario consentito.")
+    if valid_words is not None:
+        # Normalise the guess and compare it against the provided dictionary.
+        normalised_guess = "".join(guess_norm)
+        if normalised_guess in valid_words:
+            pass
+        elif not any(_normalise_word(word) == normalised_guess for word in valid_words):
+            raise ValidationError("La parola inserita non è presente nel dizionario delle risposte.")
 
     if hard_constraints is None:
         return

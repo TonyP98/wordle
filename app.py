@@ -205,14 +205,14 @@ def main() -> None:
 
     if dictionaries.missing_files:
         render_toast(
-            "Carica i file in 'data/answers.txt' e 'data/allowed.txt' per iniziare a giocare.",
+            "Carica il file 'data/answers.txt' per iniziare a giocare.",
             level="error",
         )
         return
 
-    if not dictionaries.answers or not dictionaries.allowed:
+    if not dictionaries.answers:
         render_toast(
-            "I dizionari devono contenere almeno una parola per poter giocare.",
+            "Il dizionario delle risposte deve contenere almeno una parola per poter giocare.",
             level="error",
         )
         return
@@ -291,16 +291,14 @@ def main() -> None:
             validate_guess(
                 guess,
                 answer,
-                dictionaries.allowed_lookup,
+                valid_words=dictionaries.answers_lookup,
                 hard_constraints=hard_constraints,
             )
         except ValidationError as exc:
             render_toast(str(exc), level="warning")
         else:
-            normalised = "".join(ch.casefold() for ch in guess)
-            canonical = dictionaries.allowed_lookup.get(normalised, guess)
-            evaluation = score_guess(canonical, answer)
-            guesses.append(canonical)
+            evaluation = score_guess(guess, answer)
+            guesses.append(guess)
             evaluations.append(evaluation)
             st.session_state["guesses"] = guesses
             st.session_state["evaluations"] = evaluations
